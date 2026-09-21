@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, false
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -23,6 +23,7 @@ class SubscriberStop(Base):
     name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    fragile: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     route: Mapped[DeliveryRoute] = relationship(back_populates="stops")
 
 
@@ -33,6 +34,10 @@ class PackBag(Base):
     bag_index: Mapped[int] = mapped_column(Integer)
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    # "fragile" 表示本袋只装易碎站点，"normal" 只装非易碎站点
+    bag_kind: Mapped[str] = mapped_column(String(16), default="normal", server_default="normal")
+    # 首袋 first / 满额开新袋 capacity / 易碎隔离 isolation
+    opened_reason: Mapped[str] = mapped_column(String(16), default="first", server_default="first")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     items: Mapped[list["BagItem"]] = relationship(back_populates="bag")
 
@@ -55,4 +60,6 @@ class RejectRecord(Base):
     stop_id: Mapped[int] = mapped_column(Integer)
     stop_name: Mapped[str] = mapped_column(String(80))
     reason: Mapped[str] = mapped_column(String(200))
+    # oversize = 单站自身超过路线限额（现网拒收）
+    kind: Mapped[str] = mapped_column(String(16), default="oversize", server_default="oversize")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

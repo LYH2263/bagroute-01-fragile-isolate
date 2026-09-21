@@ -17,7 +17,12 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    fragile: bool
     model_config = {"from_attributes": True}
+
+
+class StopUpdate(BaseModel):
+    fragile: bool
 
 
 class BagItemOut(BaseModel):
@@ -25,6 +30,7 @@ class BagItemOut(BaseModel):
     stop_name: str
     weight_kg: float
     volume_l: float
+    fragile: bool = False
 
 
 class BagOut(BaseModel):
@@ -33,6 +39,8 @@ class BagOut(BaseModel):
     bag_index: int
     weight_kg: float
     volume_l: float
+    bag_kind: str = "normal"
+    opened_reason: str = "first"
     items: list[BagItemOut] = []
     model_config = {"from_attributes": True}
 
@@ -43,6 +51,7 @@ class RejectOut(BaseModel):
     stop_id: int
     stop_name: str
     reason: str
+    kind: str = "oversize"
     created_at: datetime
     model_config = {"from_attributes": True}
 

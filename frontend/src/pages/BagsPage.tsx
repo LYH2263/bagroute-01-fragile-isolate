@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
-type Bag = { id: number; route_id: number; bag_index: number; weight_kg: number; volume_l: number; items: { stop_name: string; weight_kg: number; volume_l: number }[] };
+type Bag = { id: number; route_id: number; bag_index: number; weight_kg: number; volume_l: number; bag_kind: string; opened_reason: string; items: { stop_name: string; weight_kg: number; volume_l: number; fragile: boolean }[] };
+
+const kindLabel = (k: string) => (k === "fragile" ? "易碎专用袋" : "普通袋");
+const reasonLabel = (r: string) =>
+  r === "first" ? "首袋" : r === "capacity" ? "满额开新袋" : r === "isolation" ? "易碎隔离开袋" : r;
+
 export default function BagsPage() {
   const [rows, setRows] = useState<Bag[]>([]);
   useEffect(() => { api<Bag[]>("/bags").then(setRows); }, []);
   return (<>
     <h2>袋明细</h2>
-    <table className="table"><thead><tr><th>路线</th><th>袋号</th><th>重量</th><th>体积</th><th>订户</th></tr></thead>
-    <tbody>{rows.map(b => <tr key={b.id}><td>{b.route_id}</td><td>{b.bag_index}</td><td className="mono">{b.weight_kg}</td><td className="mono">{b.volume_l}</td>
-      <td>{b.items.map(i => i.stop_name).join(" → ")}</td></tr>)}
-      {!rows.length && <tr><td colSpan={5}>尚无装袋结果，请先执行装袋</td></tr>}
+    <table className="table"><thead><tr><th>路线</th><th>袋号</th><th>类型</th><th>开袋原因</th><th>重量</th><th>体积</th><th>订户</th></tr></thead>
+    <tbody>{rows.map(b => <tr key={b.id} className={b.bag_kind === "fragile" ? "row--fragile" : ""}><td>{b.route_id}</td><td>{b.bag_index}</td>
+      <td><span className={`bag-kind bag-kind--${b.bag_kind}`}>{kindLabel(b.bag_kind)}</span></td>
+      <td><span className={`bag-reason bag-reason--${b.opened_reason}`}>{reasonLabel(b.opened_reason)}</span></td>
+      <td className="mono">{b.weight_kg}</td><td className="mono">{b.volume_l}</td>
+      <td>{b.items.map(i => `${i.stop_name}${i.fragile ? "（易碎）" : ""}`).join(" → ")}</td></tr>)}
+      {!rows.length && <tr><td colSpan={7}>尚无装袋结果，请先执行装袋</td></tr>}
     </tbody></table>
   </>);
 }

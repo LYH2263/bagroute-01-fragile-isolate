@@ -250,3 +250,47 @@ button {
 }
 .fill { height: 10px; background: #2a3824; border-radius: 2px; overflow: hidden; }
 .fill > span { display: block; height: 100%; background: var(--accent); }
+
+/* —— fragile isolation —— */
+:root {
+  --fragile: #e8b24a;
+  --fragile-soft: #4a3c1e;
+  --fragile-line: #8a6d2e;
+}
+.stop-chip--fragile { border-left-color: var(--fragile); }
+.stop-chip .fragile-tag {
+  align-self: flex-start;
+  font-size: .65rem; font-weight: 700;
+  color: #20180a; background: var(--fragile);
+  border-radius: 3px; padding: 0 .35rem;
+}
+.fragile-toggle {
+  display: flex; align-items: center; gap: .25rem;
+  font-size: .72rem; color: var(--route-muted);
+  margin-top: .1rem;
+}
+.fragile-toggle input { padding: 0; width: auto; accent-color: var(--fragile); }
+.stop-bead-dot--fragile {
+  background: var(--fragile);
+  box-shadow: 0 0 0 2px var(--fragile-line);
+}
+.stop-bead:has(.stop-bead-dot--fragile) .stop-bead-seq { color: var(--fragile); }
+
+.bag-headline { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.bag-kind, .bag-reason, .reject-kind {
+  font-size: .68rem; font-weight: 700; border-radius: 999px;
+  padding: .08rem .5rem; border: 1px solid transparent;
+  font-family: "Noto Sans SC", system-ui, sans-serif;
+}
+.bag-kind--normal { color: var(--route-leaf); background: #1d2b16; border-color: var(--route-moss); }
+.bag-kind--fragile { color: var(--fragile); background: var(--fragile-soft); border-color: var(--fragile-line); }
+.bag-reason--first { color: var(--route-muted); background: #141c12; border-color: #2e3b2a; }
+.bag-reason--capacity { color: #e88a4a; background: #33200f; border-color: #8a532e; }
+.bag-reason--isolation { color: var(--fragile); background: var(--fragile-soft); border-color: var(--fragile-line); }
+.reject-kind--oversize { color: #ff9b7a; background: #3a1d12; border-color: var(--reject); }
+.bag-block--fragile { background: var(--fragile); color: #20180a; }
+.bag-block-flag {
+  display: block; font-size: .6rem; font-weight: 700; opacity: .85;
+}
+tr.row--fragile { background: rgba(232, 178, 74, .06); }
+.page-hint { color: var(--route-muted); font-size: .8rem; margin: -.4rem 0 .9rem; }
