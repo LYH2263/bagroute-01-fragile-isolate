@@ -11,6 +11,7 @@ from app.schemas.schemas import (
     RejectOut,
     RouteOut,
     StopOut,
+    StopPatch,
     WeightOut,
 )
 from app.services.pack_engine import StopItem, pack_route
@@ -36,6 +37,17 @@ def stops(route_id: int | None = None, db: Session = Depends(get_db)):
     return db.scalars(q).all()
 
 
+@api_router.patch("/stops/{stop_id}", response_model=StopOut)
+def patch_stop(stop_id: int, body: StopPatch, db: Session = Depends(get_db)):
+    stop = db.get(SubscriberStop, stop_id)
+    if not stop:
+        raise HTTPException(404, "订户点不存在")
+    stop.is_fragile = body.is_fragile
+    db.commit()
+    db.refresh(stop)
+    return stop
+
+
 @api_router.post("/pack", response_model=list[BagOut])
 def pack(body: PackRequest, db: Session = Depends(get_db)):
     route = db.get(DeliveryRoute, body.route_id)
@@ -56,7 +68,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
         select(SubscriberStop).where(SubscriberStop.route_id == route.id).order_by(SubscriberStop.seq)
     ).all()
     items = [
-        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name) for s in stops
+        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name, s.is_fragile) for s in stops
     ]
     result = pack_route(items, route.max_weight_kg, route.max_volume_l)
     out_bags: list[PackBag] = []
@@ -66,6 +78,8 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
             bag_index=bag.bag_index,
             weight_kg=round(bag.weight_kg, 3),
             volume_l=round(bag.volume_l, 3),
+            kind=bag.kind,
+            split_reason=bag.split_reason,
         )
         db.add(row)
         db.flush()
@@ -77,16 +91,18 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
                     stop_name=it.label,
                     weight_kg=it.weight_kg,
                     volume_l=it.volume_l,
+                    is_fragile=it.is_fragile,
                 )
             )
         out_bags.append(row)
-    for stop, reason in result.rejects:
+    for rej in result.rejects:
         db.add(
             RejectRecord(
                 route_id=route.id,
-                stop_id=stop.stop_id,
-                stop_name=stop.label,
-                reason=reason,
+                stop_id=rej.item.stop_id,
+                stop_name=rej.item.label,
+                reason=rej.reason,
+                reason_code=rej.reason_code,
             )
         )
     db.commit()
@@ -97,12 +113,15 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
             bag_index=b.bag_index,
             weight_kg=b.weight_kg,
             volume_l=b.volume_l,
+            kind=b.kind,
+            split_reason=b.split_reason,
             items=[
                 BagItemOut(
                     stop_id=i.stop_id,
                     stop_name=i.stop_name,
                     weight_kg=i.weight_kg,
                     volume_l=i.volume_l,
+                    is_fragile=i.is_fragile,
                 )
                 for i in db.scalars(select(BagItem).where(BagItem.bag_id == b.id)).all()
             ],
@@ -124,12 +143,15 @@ def bags(db: Session = Depends(get_db)):
                 bag_index=b.bag_index,
                 weight_kg=b.weight_kg,
                 volume_l=b.volume_l,
+                kind=b.kind,
+                split_reason=b.split_reason,
                 items=[
                     BagItemOut(
                         stop_id=i.stop_id,
                         stop_name=i.stop_name,
                         weight_kg=i.weight_kg,
                         volume_l=i.volume_l,
+                        is_fragile=i.is_fragile,
                     )
                     for i in items
                 ],

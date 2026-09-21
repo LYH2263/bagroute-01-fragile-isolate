@@ -17,7 +17,12 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    is_fragile: bool
     model_config = {"from_attributes": True}
+
+
+class StopPatch(BaseModel):
+    is_fragile: bool
 
 
 class BagItemOut(BaseModel):
@@ -25,6 +30,7 @@ class BagItemOut(BaseModel):
     stop_name: str
     weight_kg: float
     volume_l: float
+    is_fragile: bool
 
 
 class BagOut(BaseModel):
@@ -33,6 +39,8 @@ class BagOut(BaseModel):
     bag_index: int
     weight_kg: float
     volume_l: float
+    kind: str = "normal"
+    split_reason: str | None = None
     items: list[BagItemOut] = []
     model_config = {"from_attributes": True}
 
@@ -43,6 +51,7 @@ class RejectOut(BaseModel):
     stop_id: int
     stop_name: str
     reason: str
+    reason_code: str = "over_limit"
     created_at: datetime
     model_config = {"from_attributes": True}
 

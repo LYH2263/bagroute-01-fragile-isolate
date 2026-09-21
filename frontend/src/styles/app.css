@@ -250,3 +250,84 @@ button {
 }
 .fill { height: 10px; background: #2a3824; border-radius: 2px; overflow: hidden; }
 .fill > span { display: block; height: 100%; background: var(--accent); }
+
+/* —— 易碎隔离：易碎用琥珀色，与普通绿色袋明确区分 —— */
+:root {
+  --fragile: #e8a33d;
+  --fragile-soft: #3a2c14;
+}
+.hint { color: var(--route-muted); font-size: .8rem; }
+
+.stop-chip { border-radius: 0 4px 4px 0; }
+.stop-chip--fragile {
+  border-left-color: var(--fragile);
+  background: var(--fragile-soft);
+}
+.fragile-toggle {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .75rem; color: var(--fragile); cursor: pointer; margin-top: .1rem;
+}
+.fragile-toggle input { accent-color: var(--fragile); }
+
+.stop-bead-dot--fragile {
+  background: var(--fragile);
+  box-shadow: 0 0 0 2px #7a5a1e;
+}
+.stop-bead-dot--fragile + .stop-bead-card .stop-bead-seq,
+.stop-bead:has(.stop-bead-dot--fragile) .stop-bead-seq { color: var(--fragile); }
+
+.bag-card {
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: .5rem .7rem;
+  margin-bottom: .8rem;
+  background: #101a12;
+}
+.bag-card--normal { border-left-color: var(--route-moss); }
+.bag-card--fragile { border-left-color: var(--fragile); background: var(--fragile-soft); }
+
+.bag-kind {
+  display: inline-block;
+  font-size: .7rem;
+  font-weight: 700;
+  padding: .05rem .45rem;
+  border-radius: 999px;
+  margin: 0 .4rem;
+  vertical-align: middle;
+}
+.bag-kind--normal { background: var(--route-moss); color: #fff; }
+.bag-kind--fragile { background: var(--fragile); color: #241a06; }
+.bag-split { color: var(--route-muted); font-size: .75rem; margin-right: .4rem; }
+
+.bag-block { position: relative; }
+.bag-block--fragile {
+  background: var(--fragile);
+  color: #241a06;
+}
+.fragile-tag {
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, .35);
+  color: #fff;
+  border-radius: 3px;
+  padding: 0 .3rem;
+  margin-right: .3rem;
+  vertical-align: middle;
+}
+.bag-block:not(.bag-block--fragile) .fragile-tag,
+.bag-kind--fragile ~ .fragile-tag { background: rgba(0, 0, 0, .25); }
+
+.bag-name-item { white-space: nowrap; }
+.bag-row--fragile { background: rgba(232, 163, 61, .07); }
+
+.reject-badge {
+  background: var(--reject);
+  color: #1d0f08;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .1rem .45rem;
+  border-radius: 999px;
+}
+.split-heading { margin-top: 1.6rem; }
